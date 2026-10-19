@@ -32,7 +32,6 @@ export class AuthController {
     private readonly config: ConfigService,
   ) {}
 
-  /** POST /auth/login — public, strict rate limit to slow credential stuffing. */
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post('login')

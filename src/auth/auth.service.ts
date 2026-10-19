@@ -16,6 +16,7 @@ import { LoginDto, TokenResponse } from './dto/auth.dto.js';
 import { RefreshTokenService } from './refresh-token.service.js';
 import { TokenDenylistService } from './token-denylist.service.js';
 import { getRefreshTtlMs } from './refresh-cookie.config.js';
+import { authLogger } from '../logger/auth-logger.config.js';
 
 export interface RequestMeta {
   ip?: string | null;
@@ -50,6 +51,12 @@ export class AuthService {
       : await bcrypt.compare(dto.password, DUMMY_HASH).then(() => false);
 
     if (!user || !passwordMatches || !user.isActive) {
+      authLogger.warn('LOGIN_FAILED', {
+        email: dto.email, // NOTE: never log the password
+        reason: !user ? 'UNKNOWN_EMAIL' : !passwordMatches ? 'INVALID_PASSWORD' : 'ACCOUNT_INACTIVE',
+        ip: meta.ip ?? null,
+        userAgent: meta.userAgent ?? null,
+      });
       throw new UnauthorizedException('Invalid email or password.');
     }
 
@@ -61,6 +68,13 @@ export class AuthService {
     });
 
     await this.usersService.markLoggedIn(user.id);
+
+    authLogger.info('LOGIN_SUCCESS', {
+      userId: user.id,
+      email: user.email,
+      ip: meta.ip ?? null,
+      userAgent: meta.userAgent ?? null,
+    });
 
     return { response: await this.issueAccessToken(user), refreshToken: token };
   }
@@ -119,6 +133,11 @@ export class AuthService {
         await this.refreshTokens.revokeFamily(record.familyId);
       }
     }
+
+    authLogger.info('LOGOUT_SUCCESS', {
+      userId: actor.userId,
+      email: actor.email ?? null,
+    });
 
     return { message: 'Logged out successfully.' };
   }

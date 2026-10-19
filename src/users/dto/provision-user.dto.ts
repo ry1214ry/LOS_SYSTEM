@@ -1,4 +1,4 @@
-// src/users/dto/provision-user.dto.ts
+
 import {
   IsEmail,
   IsEnum,
@@ -9,13 +9,7 @@ import {
 } from 'class-validator';
 import { SystemRole } from '../../auth/enums/role.enum.js';
 
-/**
- * Body of `POST /users/provision`.
- *
- * If `temporaryPassword` is omitted the API generates a strong one, returns it
- * exactly once in the response, and flags the account with
- * `mustChangePassword = true`.
- */
+
 export class ProvisionUserDto {
   @IsEmail()
   @MaxLength(255)

@@ -16,14 +16,11 @@ async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
   const isProduction = config.get<string>('NODE_ENV') === NodeEnvironment.Production;
 
-  // Behind a load balancer / ingress, trust the first proxy hop so req.ip and
-  // the throttler see the real client address.
   app.getHttpAdapter().getInstance().set('trust proxy', 1);
 
-  // Parses the HttpOnly refresh cookie into req.cookies.
+
   app.use(cookieParser());
 
-  // ---- Security headers ------------------------------------------------
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -39,7 +36,6 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  // ---- Strict CORS -----------------------------------------------------
   const corsOrigins = resolveCorsOrigins(config);
   if (corsOrigins.length > 0) {
     app.enableCors({

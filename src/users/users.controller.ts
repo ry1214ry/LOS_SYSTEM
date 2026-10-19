@@ -16,22 +16,12 @@ import { SystemRole } from '../auth/enums/role.enum.js';
 import { ProvisionUserDto } from './dto/provision-user.dto.js';
 import { UsersService } from './users.service.js';
 
-/**
- * Administrative user-management surface.
- *
- * Authentication is enforced globally (JwtAuthGuard); every route below is
- * additionally restricted with @Roles.
- */
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  /**
-   * POST /users/provision
-   * Restricted to Super Administrator and Administrator. The service layer
-   * further prevents an Administrator from minting a Super Administrator.
-   */
-  
+
+
   @Post('provision')
   @Roles(SystemRole.SUPER_ADMINISTRATOR, SystemRole.ADMINISTRATOR)
   @HttpCode(HttpStatus.CREATED)

@@ -12,12 +12,7 @@ import { Permission } from './entities/permission.entity.js';
 import { Role } from './entities/role.entity.js';
 import { RbacService } from './rbac.service.js';
 
-/**
- * Idempotently materialises the compiled-in RBAC matrix into
- * `permissions`, `roles` and `role_permissions`.
- *
- * Safe to run on every boot (SEED_ON_BOOT=true) and from `npm run seed`.
- */
+
 @Injectable()
 export class RbacSeedService {
   private readonly logger = new Logger(RbacSeedService.name);
@@ -28,7 +23,8 @@ export class RbacSeedService {
     @InjectRepository(Permission)
     private readonly permissionsRepository: Repository<Permission>,
     private readonly rbac: RbacService,
-  ) {}
+  ) { }
+  
 
   async seed(): Promise<{ roles: number; permissions: number }> {
     await this.seedPermissions();

@@ -34,13 +34,12 @@ COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/scripts ./scripts
 COPY --from=build --chown=node:node /app/package.json ./package.json
 
-# Drop privileges: the official image already provides the unprivileged
-# `node` user (uid 1000); the copy above already owns the files.
+
 USER node
 
 EXPOSE 3000
 
-# Liveness only — readiness (which touches Postgres) is left to the orchestrator.
+
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
