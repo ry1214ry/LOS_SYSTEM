@@ -1,0 +1,76 @@
+# Production-shaped local/CI stack: the NestJS API beside a tuned PostgreSQL.
+#
+#   docker compose up --build
+#
+# Values are read from `.env` (copy `.env.example` first). The API service
+# overrides DB_HOST so it talks to the `db` service instead of localhost.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_DATABASE:-LOS-SYSTEM}
+      # Deterministic collation keeps index behaviour consistent across hosts.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    command:
+      - postgres
+      # ---- Connection / memory tuning -----------------------------------
+      - -c max_connections=200
+      - -c shared_buffers=512MB
+      - -c effective_cache_size=1536MB
+      - -c work_mem=8MB
+      - -c maintenance_work_mem=128MB
+      # ---- Write-ahead log / checkpoints --------------------------------
+      - -c wal_level=replica
+      - -c synchronous_commit=on
+      - -c max_wal_size=2GB
+      - -c min_wal_size=256MB
+      - -c checkpoint_completion_target=0.9
+      # ---- Planner hints for SSD-backed storage -------------------------
+      - -c random_page_cost=1.1
+      - -c effective_io_concurrency=200
+      # ---- Observability ------------------------------------------------
+      - -c log_min_duration_statement=500
+      - -c shared_preload_libraries=pg_stat_statements
+      - -c pg_stat_statements.track=all
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_DATABASE:-LOS-SYSTEM}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    # Not published by default — only the API needs to reach it.
+    expose:
+      - "5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_SSL: "false"
+      # First-boot convenience: create the schema and load the RBAC matrix +
+      # bootstrap Super Administrator. Replace with migrations in real prod.
+      DB_SYNCHRONIZE: "true"
+      SEED_ON_BOOT: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
