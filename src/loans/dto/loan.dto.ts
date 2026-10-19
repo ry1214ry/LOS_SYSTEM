@@ -21,6 +21,7 @@ export class CreateLoanDto {
   @MaxLength(160)
   applicantName: string;
 
+
   @IsEmail()
   @MaxLength(255)
   applicantEmail: string;
@@ -29,6 +30,7 @@ export class CreateLoanDto {
   @IsString()
   @MaxLength(32)
   applicantPhone?: string;
+  
 
   @IsOptional()
   @IsString()

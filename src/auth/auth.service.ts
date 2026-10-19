@@ -52,8 +52,12 @@ export class AuthService {
 
     if (!user || !passwordMatches || !user.isActive) {
       authLogger.warn('LOGIN_FAILED', {
-        email: dto.email, // NOTE: never log the password
-        reason: !user ? 'UNKNOWN_EMAIL' : !passwordMatches ? 'INVALID_PASSWORD' : 'ACCOUNT_INACTIVE',
+        email: dto.email,
+        reason: !user
+          ? 'UNKNOWN_EMAIL'
+          : !passwordMatches
+            ? 'INVALID_PASSWORD'
+            : 'ACCOUNT_INACTIVE',
         ip: meta.ip ?? null,
         userAgent: meta.userAgent ?? null,
       });
@@ -79,11 +83,7 @@ export class AuthService {
     return { response: await this.issueAccessToken(user), refreshToken: token };
   }
 
-  /**
-   * Rotates a refresh token: the presented token is revoked and a fresh one is
-   * issued into the same family. A revoked token being presented again is
-   * treated as theft and the entire family is invalidated.
-   */
+
   async refresh(rawToken: string | undefined, meta: RequestMeta = {}): Promise<AuthResult> {
     if (!rawToken) {
       throw new UnauthorizedException('Missing refresh token.');

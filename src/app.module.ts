@@ -23,7 +23,7 @@ import { UsersModule } from './users/users.module.js';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      // Fail the boot if any variable is missing or malformed.
+     
       validate: validateEnv,
     }),
     ThrottlerModule.forRootAsync({
