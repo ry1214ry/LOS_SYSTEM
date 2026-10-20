@@ -1,7 +1,6 @@
 
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
-
 export const authLogger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
@@ -11,7 +10,7 @@ export const authLogger = winston.createLogger({
   ),
 
   transports: [
-
+    
     new winston.transports.DailyRotateFile({
       dirname: 'logs/auth',
       filename: 'auth-%DATE%.log',
@@ -20,10 +19,8 @@ export const authLogger = winston.createLogger({
       maxSize: '20m',
       maxFiles: '30d',
     }),
-
     new winston.transports.Console({
       silent: process.env.NODE_ENV === 'production',
     }),
-
   ],
 });

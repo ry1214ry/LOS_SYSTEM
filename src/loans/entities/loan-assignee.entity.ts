@@ -12,7 +12,7 @@ import {
 import { User } from '../../users/entities/user.entity.js';
 import { LoanApplication } from './loan-application.entity.js';
 
-/** Join table: which users are working a given loan application. */
+
 @Entity('loan_assignees')
 @Unique('UQ_loan_assignees_loan_user', ['loanId', 'userId'])
 @Index('IDX_loan_assignees_loan_id', ['loanId'])

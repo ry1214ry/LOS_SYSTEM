@@ -12,10 +12,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import type { AuthenticatedUser } from '../common/decorators/current-user.decorator.js';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator.js';
 import { Permission } from '../auth/enums/permission.enum.js';
+import type { AuthenticatedUser } from '../common/decorators/current-user.decorator.js';
+import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import {
   AddAssigneeDto,
   CreateCommentDto,
@@ -26,18 +26,6 @@ import {
   UpdateLoanDto,
 } from './dto/loan.dto.js';
 import { LoansService } from './loans.service.js';
-
-/**
- * Loan Application workflow.
- *
- * Every route is annotated with the exact permission from the RBAC matrix.
- * Authentication is global; authorization is deny-by-default through
- * PermissionsGuard.
- *
- * NOTE: because the matrix grants `loan:reject` to no role, the reject route
- * below is intentionally unreachable until policy changes. It is kept so the
- * endpoint contract is complete and flipping the matrix enables it.
- */
 
 @Controller('loans')
 export class LoanController {
@@ -104,6 +92,7 @@ export class LoanController {
   }
 
   // ---- Comments ---------------------------------------------------------
+
   @Post(':id/comments')
   @RequirePermissions(Permission.LOAN_COMMENT)
   addComment(
@@ -137,10 +126,10 @@ export class LoanController {
   async download(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Param('documentId', new ParseUUIDPipe()) documentId: string,
+    
   ) {
     const document = await this.loansService.getDocument(id, documentId);
-    // The binary is streamed from object storage. In production this is where a
-    // short-lived pre-signed URL would be minted; the metadata stays auditable.
+
     return {
       document,
       downloadUrl: `/storage/${encodeURIComponent(document.storageKey)}`,

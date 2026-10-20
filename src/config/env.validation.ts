@@ -73,7 +73,6 @@ export class EnvironmentVariables {
   @IsString()
   DB_DATABASE: string = 'LOS-SYSTEM';
 
-  /** Auto-create/alter tables to match the entities. NEVER enable in prod. */
   @Transform(toBoolean)
   @IsBoolean()
   DB_SYNCHRONIZE: boolean = false;

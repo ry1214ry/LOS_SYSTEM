@@ -43,12 +43,7 @@ function databaseErrorCode(exception: unknown): string | undefined {
   return undefined;
 }
 
-/**
- * Converts every thrown value into one predictable JSON error envelope and
- * keeps stack traces out of responses (they are logged instead).
- *
- * Registered globally in `main.ts` via `app.useGlobalFilters(...)`.
- */
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);

@@ -1,4 +1,4 @@
-// src/loans/loans.service.ts
+
 import {
   BadRequestException,
   ConflictException,
@@ -24,6 +24,7 @@ import {
   RegisterDocumentDto,
   UpdateLoanDto,
 } from './dto/loan.dto.js';
+
 
 @Injectable()
 export class LoansService {
@@ -53,6 +54,7 @@ export class LoansService {
     });
     return this.loans.save(loan);
   }
+  
 
   async findAll(query: ListLoansDto): Promise<{ items: LoanApplication[]; total: number }> {
     const [items, total] = await this.loans.findAndCount({

@@ -12,19 +12,13 @@ import {
 import { User } from '../../users/entities/user.entity.js';
 import { LoanStatus } from '../enums/loan-status.enum.js';
 
-/** `pg` returns NUMERIC as a string; expose it as a number to callers. */
+
 const numericTransformer = {
   to: (value: number | null | undefined): number | null | undefined => value,
   from: (value: string | null): number | null => (value === null ? null : Number(value)),
 };
 
-/**
- * The central workflow record.
- *
- * Indexes are declared for the access patterns the API actually serves:
- * filtering by status, "my applications" by creator, work queues by assignee,
- * and the (status, createdAt) pair used by the paginated list endpoint.
- */
+
 @Entity('loan_applications')
 @Index('IDX_loan_applications_status', ['status'])
 @Index('IDX_loan_applications_created_by', ['createdById'])
@@ -71,6 +65,7 @@ export class LoanApplication {
   status: LoanStatus;
 
   // ---- Relationships (all FK columns are indexed above) ----------------
+
   @Column({ type: 'uuid' })
   createdById: string;
 

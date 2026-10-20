@@ -1,8 +1,8 @@
-// src/common/decorators/current-user.decorator.ts
+
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { SystemRole } from '../../auth/enums/role.enum.js';
 
-/** Shape attached to the request by `JwtStrategy.validate()`. */
+
 export interface AuthenticatedUser {
   userId: string;
   email: string;
@@ -11,9 +11,7 @@ export interface AuthenticatedUser {
   exp?: number;
 }
 
-/**
- * Injects the authenticated principal, e.g. `@CurrentUser() user: AuthenticatedUser`.
- */
+
 export const CurrentUser = createParamDecorator(
   (data: keyof AuthenticatedUser | undefined, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest<{ user?: AuthenticatedUser }>();
